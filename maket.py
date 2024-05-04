@@ -38,8 +38,11 @@ verified_track_name = None
 global track_query
 track_query = False
 
+global verified_track_query
+verified_track_query = False
+
 global track_list
-track_list = ["Царица", "Асфальт 8", "Georgian Disco"]
+track_list = []
 
 def ticket_invoice(message):
     bot.send_invoice(
@@ -93,11 +96,10 @@ def list_of_tracks():
         i += 1
 
 def control_panel(message):
-    bot.send_message(message.chat.id, 'Панель управления⬇️', reply_markup = markupKeyboard)
+    bot.send_message(message.chat.id, '<b>Панель управления</b>⬇️', reply_markup = markupKeyboard, parse_mode='html')
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    subscribe_check(message)
     if subscribe_check(message) == True:
         db_check(message)
         control_panel(message)
@@ -118,8 +120,6 @@ def callback_message(callback):
     global verified_track_name
 
     if callback.data == 'control_panel':
-        subscribe_check(callback.message)
-
         if subscribe_check(callback.message) == True:
             control_panel(callback.message)
 
@@ -146,7 +146,7 @@ def callback_message(callback):
             new_track_chat_id,
             'Трек на заказ',
             'Ваш трек одобрен!\nКак только пройдет оплата, мы включим ' + verified_track_name + ' в течение 10-15 минут',
-            'TRACK',
+            verified_track_name,
             paymentToken,
             'RUB',
             track_price)
@@ -202,10 +202,10 @@ def answer(message):
 
             track_number = len(track_list)
             bot.send_message(message.chat.id,
-                             'Заказ трека стоит 300 рублей, трек можно заказать в таком то стиле такие условия и тд\n' +
-                             'Введите трек, который хотите заказать и ждите, пока он пройдет верификацию' +
-                             f'\n\nСейчас треков в очереди: {track_number}' +
-                             f'\nПримерное время ожидания ~ {track_number * 10} минут', reply_markup=cancel_markup)
+                        'Заказ трека стоит 300 рублей, трек можно заказать в таком то стиле такие условия и тд\n' +
+                        'Введите трек, который хотите заказать и ждите, пока он пройдет верификацию' +
+                        f'\n\nТреков в очереди: {track_number}' +
+                        f'\nПримерное время ожидания ~ {(track_number * 10)+10} минут', reply_markup=cancel_markup)
             bot.register_next_step_handler(message, track)
         else:
             bot.send_message(message.chat.id, 'Попробуйте позже')
@@ -227,7 +227,8 @@ def answer(message):
         cursor.close()
         conn.close()
 
-        bot.send_message(message.chat.id, info)
+        video = open('resources/SDB BIRTHDAY.mp4', 'rb')
+        bot.send_video(message.chat.id, video, caption=info)
 
 def admin(message):
     password = '14882012'
@@ -292,10 +293,10 @@ def got_payment(message):
 
         bot.send_message(message.chat.id, 'Вы купили билет! Ваш код: ' + f'{key}', parse_mode='Markdown')
 
-    elif message.successful_payment.invoice_payload == 'TRACK':
-        bot.send_message(905069756, '"' + verified_track_name + '" оплатили')
+    elif message.successful_payment.total_amount == 30000:
+        bot.send_message(905069756, '"' + message.successful_payment.invoice_payload + '" оплатили')
         bot.send_message(message.chat.id, 'Трек успешно оплачен!', parse_mode='Markdown')
 
-        track_list.append(verified_track_name)
+        track_list.append(message.successful_payment.invoice_payload)
 
 bot.infinity_polling()

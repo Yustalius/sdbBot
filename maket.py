@@ -227,7 +227,7 @@ def answer(message):
         cursor.close()
         conn.close()
 
-        sdb_logo = open('resources/sdb b а 3.png', 'rb')
+        sdb_logo = open('resources/sdb b а 3.jpg', 'rb')
         bot.send_photo(message.chat.id, sdb_logo, caption=info)
 
 def admin(message):

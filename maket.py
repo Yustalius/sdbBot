@@ -227,8 +227,8 @@ def answer(message):
         cursor.close()
         conn.close()
 
-        video = open('resources/SDB BIRTHDAY.mp4', 'rb')
-        bot.send_video(message.chat.id, video, caption=info)
+        sdb_logo = open('resources/sdb logo.jpg', 'rb')
+        bot.send_photo(message.chat.id, sdb_logo, caption=info)
 
 def admin(message):
     password = '14882012'

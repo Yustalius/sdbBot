@@ -157,6 +157,8 @@ def control_panel(message):
 
 def track(message):
     global track_query, track_name, new_track_message, track_cancellations
+    track_name = message.text.strip()
+    new_track_message = message
 
     if message.text.lower() == 'отмена':
         bot.delete_message(message.chat.id, message.message_id - 1)
@@ -167,9 +169,6 @@ def track(message):
         control_panel(message)
     else:
         track_query = True
-        track_name = message.text.strip()
-        new_track_message = message
-
         bot.send_message(message.chat.id, 'Ожидайте одобрения трека ', reply_markup = markupKeyboard)
         make_log(message.from_user.username, f'request: {track_name}')
 

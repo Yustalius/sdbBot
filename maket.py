@@ -96,7 +96,6 @@ def list_of_tracks():
         i += 1
 
 def find_all_tickets():
-    print('find_all_tickets')
     conn = sqlite3.connect('database/sdb.db')
     cursor = conn.cursor()
 
@@ -110,7 +109,6 @@ def find_all_tickets():
     return tickets
 
 def make_tickets_list_text(tickets):
-    print('make_tickets_list_text')
     global tickets_list
     tickets_list = [ticket[0] for ticket in tickets]
 
@@ -121,30 +119,25 @@ def make_tickets_list_text(tickets):
     return tickets_text
 
 def delete_ticket(message):
-    print('delete_ticket')
     global tickets_list
-    for i in range(len(tickets_list)):
-        if message.text == f'{tickets_list[i]}':
-            print(f'{tickets_list[i]}')
-            print(tickets_list)
-            conn = sqlite3.connect('database/sdb.db')
-            cursor = conn.cursor()
+    if message.text in f'{tickets_list}':
+        conn = sqlite3.connect('database/sdb.db')
+        cursor = conn.cursor()
 
-            cursor.execute('DELETE FROM tickets WHERE ticket_key = ?', (message.text,))
+        cursor.execute('DELETE FROM tickets WHERE ticket_key = ?', (message.text,))
 
-            conn.commit()
-            cursor.close()
-            conn.close()
+        conn.commit()
+        cursor.close()
+        conn.close()
 
-            tickets = find_all_tickets()
-            tickets_text = make_tickets_list_text(tickets)
+        tickets = find_all_tickets()
+        tickets_text = make_tickets_list_text(tickets)
 
-            bot.edit_message_text(tickets_text, message.chat.id, message.message_id-1)
-            bot.delete_message(message.chat.id, message.id)
+        bot.edit_message_text(tickets_text, message.chat.id, message.message_id - 1)
+        bot.delete_message(message.chat.id, message.id)
 
-            bot.register_next_step_handler(message, delete_ticket)
-        else:
-            control_panel(message)
+        bot.register_next_step_handler(message, delete_ticket)
+    control_panel(message)
 
 def control_panel(message):
     bot.send_message(message.chat.id, '<b>Панель управления</b>⬇️', reply_markup = markupKeyboard, parse_mode='html')

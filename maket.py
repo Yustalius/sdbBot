@@ -186,7 +186,7 @@ def track(message):
                          , reply_markup = verification_markup)
 
 def make_log(username, comment):
-    log_file = open('logs.txt', 'a')
+    log_file = open('/data/logs.txt', 'a')
     date = datetime.now().strftime("%d-%m-%Y")
     time = datetime.now().strftime("%H:%M:%S")
 

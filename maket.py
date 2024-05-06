@@ -1,6 +1,7 @@
 import telebot
 import sqlite3
 import random
+import io
 from datetime import datetime
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice
 
@@ -186,10 +187,12 @@ def track(message):
                          , reply_markup = verification_markup)
 
 def make_log(username, comment):
+    log_file = open('logs.txt', 'a')
     date = datetime.now().strftime("%d-%m-%Y")
     time = datetime.now().strftime("%H:%M:%S")
-    print(f'[{date} {time}][@{username}][{comment}]')
 
+    log_file.write(f'[{date} {time}][@{username}][{comment}]\n')
+    log_file.close()
 @bot.message_handler(commands=['start'])
 def start(message):
     make_log(message.from_user.username, 'START')

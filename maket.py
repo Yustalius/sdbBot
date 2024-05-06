@@ -12,16 +12,18 @@ track_price = [LabeledPrice('Заказать трек', 30000)]
 
 global markupKeyboard
 markupKeyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-
 servicesButton = KeyboardButton("КУПИТЬ БИЛЕТ")
 markupKeyboard.add(servicesButton)
-
 trackRequestButton = KeyboardButton("ЗАКАЗАТЬ ТРЕК")
 markupKeyboard.add(trackRequestButton)
-
 infoButton = KeyboardButton('О нас')
 nextPartyButton = KeyboardButton('Когда следующая тусовка?')
 markupKeyboard.row(infoButton, nextPartyButton)
+
+global delete_track_markup
+delete_track_markup = InlineKeyboardMarkup()
+delete_track_button = InlineKeyboardButton('Удалить трек', callback_data='delete track')
+delete_track_markup.add(delete_track_button)
 
 global new_track_chat_id
 new_track_chat_id = None
@@ -43,6 +45,9 @@ verified_track_query = False
 
 global track_list
 track_list = []
+
+global tickets_list
+tickets_list = []
 
 def ticket_invoice(message):
     bot.send_invoice(
@@ -83,17 +88,63 @@ def subscribe_check(message):
         return False
 
 def list_of_tracks():
-    global delete_markup
-    delete_markup = InlineKeyboardMarkup()
-    delete_track_button = InlineKeyboardButton('Удалить трек', callback_data='delete track')
-    delete_markup.add(delete_track_button)
-
-    global text
-    text = 'Заказанные треки:'
+    global tracks_text
+    tracks_text = 'Заказанные треки:'
     i = 1
-    for element in track_list:
-        text += f'\n{i}. {element}'
+    for track in track_list:
+        tracks_text += f'\n{i}. {track}'
         i += 1
+
+def find_all_tickets():
+    print('find_all_tickets')
+    conn = sqlite3.connect('database/sdb.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT ticket_key FROM tickets')
+    tickets = cursor.fetchall()
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return tickets
+
+def make_tickets_list_text(tickets):
+    print('make_tickets_list_text')
+    global tickets_list
+    tickets_list = [ticket[0] for ticket in tickets]
+
+    tickets_text = 'Купленные билеты: '
+    for ticket in tickets_list:
+        tickets_text += f'\n• Билет {ticket}'
+
+    return tickets_text
+
+def delete_ticket(message):
+    print('delete_ticket')
+    global tickets_list
+    for i in range(len(tickets_list)):
+        if message.text == f'{tickets_list[i]}':
+            print(f'{tickets_list[i]}')
+            print(tickets_list)
+            conn = sqlite3.connect('database/sdb.db')
+            cursor = conn.cursor()
+
+            cursor.execute('DELETE FROM tickets WHERE ticket_key = ?', (message.text,))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            tickets = find_all_tickets()
+            tickets_text = make_tickets_list_text(tickets)
+
+            bot.edit_message_text(tickets_text, message.chat.id, message.message_id-1)
+            bot.delete_message(message.chat.id, message.id)
+
+            bot.register_next_step_handler(message, delete_ticket)
+        else:
+            control_panel(message)
 
 def control_panel(message):
     bot.send_message(message.chat.id, '<b>Панель управления</b>⬇️', reply_markup = markupKeyboard, parse_mode='html')
@@ -131,12 +182,19 @@ def callback_message(callback):
 
     elif callback.data == 'track list':
         list_of_tracks()
-        bot.send_message(callback.message.chat.id, text, reply_markup=delete_markup)
+        bot.send_message(callback.message.chat.id, tracks_text, reply_markup=delete_track_markup)
+
+    elif callback.data == 'ticket list':
+        tickets = find_all_tickets()
+        tickets_text_result = make_tickets_list_text(tickets)
+
+        bot.send_message(callback.message.chat.id, tickets_text_result)
+        bot.register_next_step_handler(callback.message, delete_ticket)
 
     elif callback.data == 'delete track':
         del track_list[0]
         list_of_tracks()
-        bot.edit_message_text(text, callback.message.chat.id, callback.message.message_id, reply_markup=delete_markup)
+        bot.edit_message_text(tracks_text, callback.message.chat.id, callback.message.message_id, reply_markup=delete_track_markup)
 
     elif callback.data == 'verify':
         verified_track_name = track_name
@@ -218,10 +276,10 @@ def answer(message):
         cursor = conn.cursor()
 
         cursor.execute('SELECT party_name, description, date FROM parties LIMIT 1')
-        users = cursor.fetchall()
+        party_info = cursor.fetchall()
 
         info = ''
-        for element in users:
+        for element in party_info:
             info += f'Следующая тусовка: {element[0]}\n\nДата: {element[2]}\n\nОписание:\n{element[1]}'
 
         cursor.close()
@@ -231,12 +289,11 @@ def answer(message):
         bot.send_photo(message.chat.id, sdb_logo, caption=info)
 
 def admin(message):
-    password = '14882012'
-
-    if message.text.strip() == password:
+    if message.text.strip() == '14882012':
         admin_markup = InlineKeyboardMarkup()
         list_of_tracks_button = InlineKeyboardButton('Список треков', callback_data='track list')
-        admin_markup.add(list_of_tracks_button)
+        list_of_tickets_button = InlineKeyboardButton('Список билетов', callback_data='ticket list')
+        admin_markup.add(list_of_tracks_button, list_of_tickets_button)
 
         bot.send_message(message.chat.id, 'Панель управления', reply_markup=admin_markup)
 

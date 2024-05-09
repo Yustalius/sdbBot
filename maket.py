@@ -361,12 +361,14 @@ def callback_message(callback):
 
             bot.send_message(905069756, f'Выполнен перевод за трек "{verified_track_dict[callback.from_user.id]}"',
                              reply_markup=admin_verify_transfer_markup)
-            bot.send_message(callback.message.chat.id, 'Ожидайте подтверждение платежа')
+            bot.delete_message(callback.message.chat.id, callback.message.message_id)
+            bot.send_message(callback.message.chat.id, f'Ожидайте подтверждение платежа "{verified_track_dict[callback.from_user.id]}"⏳')
+
 
         else:
             make_log(new_track_message.from_user.username, 'TRANSFER QUERY')
             bot.send_message(callback.message.chat.id,
-                             'В данный момент происходит обработка платежа, подождите чуть-чуть :)')
+                             'В данный момент происходит обработка платежа🤖\nНажмите еще раз через пару минут :)')
 
     elif callback.data == 'admin verify transfer':
         make_log('admin', f"transfer '{verified_track_dict[transfer_verification_callback.from_user.id]}' verified")

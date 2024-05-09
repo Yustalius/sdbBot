@@ -316,22 +316,8 @@ def callback_message(callback):
         make_log(new_track_message.from_user.username, f"'{verified_track_name}' verified")
         bot.edit_message_text('Трек "' + verified_track_name + '" одобрен', callback.message.chat.id,
                               callback.message.message_id)
-        bot.send_message(new_track_message.chat.id,
-                         'Трек "' + verified_track_name + '" одобрен🥳\n\n')
+        bot.send_message(new_track_message.chat.id, 'Трек "' + verified_track_name + '" одобрен🥳\n\nОплата⬇️', reply_markup=payment_markup)
         track_query = False
-
-        transfer_markup = InlineKeyboardMarkup()
-        transfer_send_button = InlineKeyboardButton('Перевел(а)', callback_data='verify transfer')
-        transfer_markup.add(transfer_send_button)
-
-        make_log(new_track_message.from_user.username, f'transfer chosen')
-        bot.send_message(callback.message.chat.id, 'Перевод 300₽ по номеру телефона/карты на *Сбербанк*' +
-                         '\nВ комментарии нужно указать название трека, который вы заказали' +
-                         f' (`{verified_track_dict[callback.from_user.id]}`)' +
-                         '\nРеквизиты/трек копируются при нажатии'
-                         '\n\n`+7(920)631-39-51`' +
-                         '\n\n`2202 2017 1573 9195`' +
-                         '\n\n*Владислав Максимилианович Ю.*', reply_markup=transfer_markup, parse_mode="MARKDOWN")
 
     elif callback.data == 'card':
         make_log(callback.from_user.username, f'card chosen')
@@ -467,7 +453,7 @@ def answer(message):
             bot.register_next_step_handler(message, track)
         else:
             make_log(message.from_user.username, 'TRACK QUERY')
-            bot.send_message(message.chat.id, 'Попробуйте позже')
+            bot.send_message(message.chat.id, 'В данный момент на верификации уже есть трек, попробуйте через 5 минут🥺')
 
     elif message.text.lower() == 'о sdbℹ️':
         bot.send_message(message.chat.id, 'Мы - *SDB PARTY*, организаторы ночных вечеринок города Р.'

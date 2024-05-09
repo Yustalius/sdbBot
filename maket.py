@@ -457,6 +457,7 @@ def answer(message):
 
     elif message.text.lower() == 'заказать трек🎶':
         make_log(message.from_user.username, 'request a song')
+        db_check(message)
         if is_party_started == True:
             global track_clicks
             track_clicks += 1

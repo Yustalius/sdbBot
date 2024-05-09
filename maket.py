@@ -56,6 +56,9 @@ transfer_verification_callback = None
 global verified_track_query
 verified_track_query = False
 
+global is_party_started
+is_party_started = False
+
 global track_list
 track_list = []
 
@@ -254,7 +257,7 @@ def admin_command(message):
 
 @bot.callback_query_handler(func=lambda callback: True)
 def callback_message(callback):
-    global track_query, verified_track_name, transfer_verification_query, transfer_verification_callback, track_nu
+    global track_query, verified_track_name, transfer_verification_query, transfer_verification_callback, is_party_started
 
     if callback.data == 'control_panel':
         make_log(callback.message.chat.username, 'control panel call')
@@ -375,7 +378,7 @@ def callback_message(callback):
         transfer_verification_query = False
         track_list.append(verified_track_dict[transfer_verification_callback.from_user.id])
         bot.edit_message_text('Перевод за трек "' + verified_track_dict[transfer_verification_callback.from_user.id] +
-                              '" подтвержден', callback.message.chat.id, callback.message.message_id)
+                              '" подтвержден✅', callback.message.chat.id, callback.message.message_id)
         bot.delete_message(transfer_verification_callback.message.chat.id, transfer_verification_callback.message.message_id+2)
         bot.send_message(transfer_verification_callback.message.chat.id,
                          f'Платеж подтвержден! Мы включим "{verified_track_dict[transfer_verification_callback.from_user.id]}" в течение {track_waiting_time() - 10} минут')
@@ -396,10 +399,16 @@ def callback_message(callback):
         transfer_verification_query = False
         make_log('admin', f'transfer_verification_query = {transfer_verification_query}')
 
+    elif callback.data == 'start party':
+        if is_party_started == False:
+            is_party_started = True
+        elif is_party_started == True:
+            is_party_started = False
+
 
 @bot.message_handler()
 def answer(message):
-    global track_query, party_name
+    global track_query, party_name, is_party_started
 
     if message.text.lower() == 'купить билет':
         make_log(message.from_user.username, 'buy a ticket')
@@ -441,26 +450,29 @@ def answer(message):
         conn.close()
 
     elif message.text.lower() == 'заказать трек🎶':
-        global track_clicks
-        track_clicks += 1
-        make_log(message.from_user.username, 'request a song')
+        if is_party_started == True:
+            global track_clicks
+            track_clicks += 1
+            make_log(message.from_user.username, 'request a song')
 
-        if track_query == False:
-            cancel_markup = ReplyKeyboardMarkup(resize_keyboard=True)
-            cancel_button = InlineKeyboardButton('ОТМЕНА')
-            cancel_markup.add(cancel_button)
+            if track_query == False:
+                cancel_markup = ReplyKeyboardMarkup(resize_keyboard=True)
+                cancel_button = InlineKeyboardButton('ОТМЕНА')
+                cancel_markup.add(cancel_button)
 
-            bot.send_message(message.chat.id, '*Стоимость заказа трека - 300₽*' +
-                             '\n\nОтправь нам название трека , который ты хочешь услышать и мы включим его для тебя!🎵' +
-                             '\n\n❗Название трека и исполнитель должны быть написаны одним сообщением ❗' +
-                             '\n\nТрек должен соответствовать тематике вечеринки и должен пройти верификацию☺️' +
-                             '\n*Рок, метал, джаз, барбарики верификацию не пройдут🚫*' +
-                             f'\n\nТреков в очереди: {len(track_list)}' +
-                             f'\nПримерное время ожидания ~ {track_waiting_time()} минут', reply_markup=cancel_markup, parse_mode='markdown')
-            bot.register_next_step_handler(message, track)
+                bot.send_message(message.chat.id, '*Стоимость заказа трека - 300₽*' +
+                                 '\n\nОтправь нам название трека , который ты хочешь услышать и мы включим его для тебя!🎵' +
+                                 '\n\n❗Название трека и исполнитель должны быть написаны одним сообщением ❗' +
+                                 '\n\nТрек должен соответствовать тематике вечеринки и должен пройти верификацию☺️' +
+                                 '\n*Рок, метал, джаз, барбарики верификацию не пройдут🚫*' +
+                                 f'\n\nТреков в очереди: {len(track_list)}' +
+                                 f'\nПримерное время ожидания ~ {track_waiting_time()} минут', reply_markup=cancel_markup, parse_mode='markdown')
+                bot.register_next_step_handler(message, track)
+            else:
+                make_log(message.from_user.username, 'TRACK QUERY')
+                bot.send_message(message.chat.id, 'В данный момент на верификации уже есть трек, попробуйте еще через 5 минут🥺')
         else:
-            make_log(message.from_user.username, 'TRACK QUERY')
-            bot.send_message(message.chat.id, 'В данный момент на верификации уже есть трек, попробуйте еще через 5 минут🥺')
+            bot.send_message(message.chat.id, 'Трек можно заказать только во время тусовки❗\n*Дождитесь 22:00*😚', parse_mode='markdown')
 
     elif message.text.lower() == 'о sdbℹ️':
         bot.send_message(message.chat.id, 'Мы - *SDB PARTY*, организаторы ночных вечеринок города Р.'
@@ -497,9 +509,11 @@ def admin(message):
         list_of_tickets_button = InlineKeyboardButton('Список билетов', callback_data='ticket list')
         statistic_button = InlineKeyboardButton('Статистика', callback_data='statistic')
         transfer_verification_query_update_button = InlineKeyboardButton('Сбросить transfer_verification_query', callback_data='transfer verification query update')
+        party_start_button = InlineKeyboardButton('Начать тусовку',callback_data='start party')
         admin_markup.row(list_of_tracks_button, list_of_tickets_button)
         admin_markup.row(statistic_button)
         admin_markup.row(transfer_verification_query_update_button)
+        admin_markup.row(party_start_button)
 
         bot.send_message(message.chat.id, 'Панель управления', reply_markup=admin_markup)
 

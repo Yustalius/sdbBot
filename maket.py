@@ -15,7 +15,7 @@ markupKeyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 # markupKeyboard.add(servicesButton)
 trackRequestButton = KeyboardButton("ЗАКАЗАТЬ ТРЕК🎶")
 markupKeyboard.add(trackRequestButton)
-infoButton = KeyboardButton('О насℹ️')
+infoButton = KeyboardButton('О SDBℹ️')
 nextPartyButton = KeyboardButton('Когда следующая тусовка?🧐')
 markupKeyboard.row(infoButton, nextPartyButton)
 
@@ -406,7 +406,7 @@ def answer(message):
         cursor.close()
         conn.close()
 
-    elif message.text.lower() == 'заказать трек':
+    elif message.text.lower() == 'заказать трек🎶':
         global track_clicks
         track_clicks += 1
         make_log(message.from_user.username, 'request a song')
@@ -426,7 +426,7 @@ def answer(message):
             make_log(message.from_user.username, 'TRACK QUERY')
             bot.send_message(message.chat.id, 'Попробуйте позже')
 
-    elif message.text.lower() == 'о нас':
+    elif message.text.lower() == 'о sdbℹ️':
         bot.send_message(message.chat.id, 'Привет, мы *SDB PARTY*, организаторы ночных вечеринок города Р.'
                                           '\n\n*Почему SDB?* Потому что четверо организаторов любят сдобные булочки и называют свой сквад - Сдобная братва 🥐'
                                           '\n\n*SDB* - нестандартный подход к организации вечеринок и к их рекламе '
@@ -435,7 +435,7 @@ def answer(message):
                                           '\n\nЖдем вас на наших вечеринках во *VMESTE BAR* ❤️', parse_mode='MARKDOWN')
         make_log(message.from_user.username, 'about us')
 
-    elif message.text.lower() == 'когда следующая тусовка?':
+    elif message.text.lower() == 'когда следующая тусовка?🧐':
         conn = sqlite3.connect('/data/sdb.db')
         cursor = conn.cursor()
 

@@ -376,7 +376,6 @@ def callback_message(callback):
         track_list.append(verified_track_dict[transfer_verification_callback.from_user.id])
         bot.edit_message_text('Перевод за трек "' + verified_track_dict[transfer_verification_callback.from_user.id] +
                               '" подтвержден', callback.message.chat.id, callback.message.message_id)
-        make_log(transfer_verification_callback.message.from_user.username, transfer_verification_callback)
         bot.delete_message(transfer_verification_callback.message.chat.id, transfer_verification_callback.message.message_id+2)
         bot.send_message(transfer_verification_callback.message.chat.id,
                          f'Платеж подтвержден! Мы включим "{verified_track_dict[transfer_verification_callback.from_user.id]}" в течение {track_waiting_time() - 10} минут')
@@ -395,6 +394,7 @@ def callback_message(callback):
 
     elif callback.data == 'transfer verification query update':
         transfer_verification_query = False
+        make_log('admin', f'transfer_verification_query = {transfer_verification_query}')
 
 
 @bot.message_handler()
@@ -499,6 +499,7 @@ def admin(message):
         transfer_verification_query_update_button = InlineKeyboardButton('Сбросить transfer_verification_query', callback_data='transfer verification query update')
         admin_markup.row(list_of_tracks_button, list_of_tickets_button)
         admin_markup.row(statistic_button)
+        admin_markup.row(transfer_verification_query_update_button)
 
         bot.send_message(message.chat.id, 'Панель управления', reply_markup=admin_markup)
 

@@ -376,6 +376,7 @@ def callback_message(callback):
         track_list.append(verified_track_dict[transfer_verification_callback.from_user.id])
         bot.edit_message_text('Перевод за трек "' + verified_track_dict[transfer_verification_callback.from_user.id] +
                               '" подтвержден', callback.message.chat.id, callback.message.message_id)
+        bot.delete_message(transfer_verification_callback.message.chat.id, transfer_verification_callback.message.message_id)
         bot.send_message(transfer_verification_callback.message.chat.id,
                          f'Платеж подтвержден! Мы включим "{verified_track_dict[transfer_verification_callback.from_user.id]}" в течение {track_waiting_time() - 10} минут')
         make_log('INFO', f"Track list: {track_list}")
@@ -383,7 +384,7 @@ def callback_message(callback):
     elif callback.data == 'reject track':
         make_log(new_track_message.from_user.username, f"'{track_name}' rejected")
         bot.send_message(new_track_message.chat.id,
-                         'Трек не был одобрен, вы можете выбрать другой трек нажав на кнопку "Заказать трек"')
+                         'К сожалению, трек не был одобрен😞\nВы можете выбрать другой трек, нажав на кнопку *"ЗАКАЗАТЬ ТРЕК🎶"*', parse_mode='markdown')
         bot.edit_message_text('Трек "' + track_name + '" не был одобрен', callback.message.chat.id,
                               callback.message.message_id)
         track_query = False

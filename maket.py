@@ -198,7 +198,7 @@ def track(message):
             control_panel(message)
         else:
             track_query = True
-            bot.send_message(message.chat.id, 'Ожидайте одобрения трека ', reply_markup=markupKeyboard)
+            bot.send_message(message.chat.id, 'Ожидайте одобрения трека⏳', reply_markup=markupKeyboard)
             make_log(message.from_user.username, f'request: {track_name}')
 
             verification_markup = InlineKeyboardMarkup()
@@ -317,9 +317,21 @@ def callback_message(callback):
         bot.edit_message_text('Трек "' + verified_track_name + '" одобрен', callback.message.chat.id,
                               callback.message.message_id)
         bot.send_message(new_track_message.chat.id,
-                         'Трек "' + verified_track_name + '" одобрен\n\nВыберите способ оплаты: ',
-                         reply_markup=payment_markup)
+                         'Трек "' + verified_track_name + '" одобрен🥳\n\n')
         track_query = False
+
+        transfer_markup = InlineKeyboardMarkup()
+        transfer_send_button = InlineKeyboardButton('Перевел(а)', callback_data='verify transfer')
+        transfer_markup.add(transfer_send_button)
+
+        make_log(new_track_message.from_user.username, f'transfer chosen')
+        bot.send_message(callback.message.chat.id, 'Перевод 300₽ по номеру телефона/карты на *Сбербанк*' +
+                         '\nВ комментарии нужно указать название трека, который вы заказали' +
+                         f' (`{verified_track_dict[callback.from_user.id]}`)' +
+                         '\nРеквизиты/трек копируются при нажатии'
+                         '\n\n`+7(920)631-39-51`' +
+                         '\n\n`2202 2017 1573 9195`' +
+                         '\n\n*Владислав Максимилианович Ю.*', reply_markup=transfer_markup, parse_mode="MARKDOWN")
 
     elif callback.data == 'card':
         make_log(callback.from_user.username, f'card chosen')
@@ -446,7 +458,7 @@ def answer(message):
             cancel_markup.add(cancel_button)
 
             bot.send_message(message.chat.id, '*Стоимость заказа трека - 300₽*' +
-                             '\n\nОтправь нам название трека , который ты хочешь услышать и мы включим его для тебя!' +
+                             '\n\nОтправь нам название трека , который ты хочешь услышать и мы включим его для тебя!🎵' +
                              '\n\n❗Название трека и исполнитель должны быть написаны одним сообщением ❗' +
                              '\n\nТрек должен соответствовать тематике вечеринки и должен пройти верификацию☺️' +
                              '\n*Рок, метал, джаз, барбарики верификацию не пройдут🚫*' +

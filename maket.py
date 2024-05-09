@@ -402,7 +402,9 @@ def callback_message(callback):
     elif callback.data == 'start party':
         if is_party_started == False:
             is_party_started = True
+            make_log('admin', 'party started')
         elif is_party_started == True:
+            make_log('admin', 'party is over')
             is_party_started = False
 
 
@@ -450,10 +452,11 @@ def answer(message):
         conn.close()
 
     elif message.text.lower() == 'заказать трек🎶':
+        make_log(message.from_user.username, 'request a song')
         if is_party_started == True:
             global track_clicks
             track_clicks += 1
-            make_log(message.from_user.username, 'request a song')
+            make_log(message.from_user.username, 'party is started')
 
             if track_query == False:
                 cancel_markup = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -472,6 +475,7 @@ def answer(message):
                 make_log(message.from_user.username, '[W A R N I N G]TRACK QUERY')
                 bot.send_message(message.chat.id, 'В данный момент на верификации уже есть трек, попробуйте еще через 5 минут🥺')
         else:
+            make_log(message.from_user.username, 'party not started')
             bot.send_message(message.chat.id, 'Трек можно заказать только во время тусовки❗\n*Дождитесь 22:00*😚', parse_mode='markdown')
 
     elif message.text.lower() == 'о sdbℹ️':

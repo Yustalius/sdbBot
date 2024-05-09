@@ -333,7 +333,7 @@ def callback_message(callback):
 
     elif callback.data == 'transfer':
         transfer_markup = InlineKeyboardMarkup()
-        transfer_send_button = InlineKeyboardButton('Перевел(а)', callback_data='verify transfer')
+        transfer_send_button = InlineKeyboardButton('Перевел(а)✅', callback_data='verify transfer')
         transfer_markup.add(transfer_send_button)
 
         make_log(new_track_message.from_user.username, f'transfer chosen')
@@ -355,7 +355,7 @@ def callback_message(callback):
             make_log(new_track_message.from_user.username, 'no transfer query')
 
             admin_verify_transfer_markup = InlineKeyboardMarkup()
-            admin_verify_transfer_button = InlineKeyboardButton('Подтвердить перевод',
+            admin_verify_transfer_button = InlineKeyboardButton('Подтвердить перевод✅',
                                                                 callback_data='admin verify transfer')
             admin_verify_transfer_markup.add(admin_verify_transfer_button)
 
@@ -376,7 +376,7 @@ def callback_message(callback):
         track_list.append(verified_track_dict[transfer_verification_callback.from_user.id])
         bot.edit_message_text('Перевод за трек "' + verified_track_dict[transfer_verification_callback.from_user.id] +
                               '" подтвержден', callback.message.chat.id, callback.message.message_id)
-        bot.delete_message(transfer_verification_callback.message.chat.id, transfer_verification_callback.message.message_id)
+        bot.delete_message(transfer_verification_callback.message.chat.id, transfer_verification_callback.message.message_id-1)
         bot.send_message(transfer_verification_callback.message.chat.id,
                          f'Платеж подтвержден! Мы включим "{verified_track_dict[transfer_verification_callback.from_user.id]}" в течение {track_waiting_time() - 10} минут')
         make_log('INFO', f"Track list: {track_list}")

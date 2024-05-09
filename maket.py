@@ -269,6 +269,7 @@ def callback_message(callback):
         subscribe = bot.get_chat_member(sdb_channel_id, callback.message.chat.id)
         if subscribe.status == "member" or subscribe.status == "creator" or subscribe.status == "administrator":
             make_log(callback.message.chat.username, 'subscribe')
+            db_check(callback.message)
 
             make_log(callback.message.chat.username, 'control panel')
             bot.send_message(callback.message.chat.id, '<b>Панель управления</b>⬇️', reply_markup=markupKeyboard,

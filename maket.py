@@ -8,7 +8,6 @@ from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 bot = telebot.TeleBot('7029750604:AAEh3Ozvv2BGmDY_VUvQBseulIiPQ-fKP60')
 paymentToken = '381764678:TEST:83709'
 
-
 global markupKeyboard
 markupKeyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 # servicesButton = KeyboardButton("КУПИТЬ БИЛЕТ🎫")
@@ -69,6 +68,7 @@ verified_track_dict = {}
 ticket_price = [LabeledPrice(f'Билет на {party_name}', 35000)]
 track_price = [LabeledPrice('Заказать трек', 30000)]
 
+
 def ticket_invoice(message):
     bot.send_invoice(
         message.chat.id,
@@ -79,6 +79,7 @@ def ticket_invoice(message):
         'RUB',
         ticket_price,
     )
+
 
 def db_check(message):
     name = message.from_user.first_name
@@ -98,6 +99,7 @@ def db_check(message):
     cursor.close()
     conn.close()
 
+
 def subscribe_check(message):
     subscribe = bot.get_chat_member(sdb_channel_id, message.from_user.id)
 
@@ -105,6 +107,7 @@ def subscribe_check(message):
         return True
     else:
         return False
+
 
 def list_of_tracks():
     global tracks_text
@@ -114,6 +117,7 @@ def list_of_tracks():
         tracks_text += f'\n{i}. {track}'
         i += 1
     make_log('admin', f'{track_list}')
+
 
 def find_all_tickets():
     conn = sqlite3.connect('/data/sdb.db')
@@ -128,6 +132,7 @@ def find_all_tickets():
 
     return tickets
 
+
 def make_tickets_list_text(tickets):
     global tickets_list
     tickets_list = [ticket[0] for ticket in tickets]
@@ -138,6 +143,7 @@ def make_tickets_list_text(tickets):
         tickets_text += f'\n• Билет {ticket}'
 
     return tickets_text
+
 
 def delete_ticket(message):
     global tickets_list
@@ -161,9 +167,11 @@ def delete_ticket(message):
         bot.register_next_step_handler(message, delete_ticket)
     control_panel(message)
 
+
 def control_panel(message):
     make_log(message.from_user.username, 'control panel')
-    bot.send_message(message.chat.id, '<b>Панель управления</b>⬇️', reply_markup = markupKeyboard, parse_mode='html')
+    bot.send_message(message.chat.id, '<b>Панель управления</b>⬇️', reply_markup=markupKeyboard, parse_mode='html')
+
 
 def track(message):
     global track_query, track_name, new_track_message, track_cancellations
@@ -190,12 +198,12 @@ def track(message):
             control_panel(message)
         else:
             track_query = True
-            bot.send_message(message.chat.id, 'Ожидайте одобрения трека ', reply_markup = markupKeyboard)
+            bot.send_message(message.chat.id, 'Ожидайте одобрения трека ', reply_markup=markupKeyboard)
             make_log(message.from_user.username, f'request: {track_name}')
 
             verification_markup = InlineKeyboardMarkup()
-            verifyButton = InlineKeyboardButton('Одобрить', callback_data = 'verify track')
-            rejectButton = InlineKeyboardButton('Отказать', callback_data = 'reject track')
+            verifyButton = InlineKeyboardButton('Одобрить', callback_data='verify track')
+            rejectButton = InlineKeyboardButton('Отказать', callback_data='reject track')
             verification_markup.row(verifyButton, rejectButton)
             make_log('INFO', f"'{track_name}' sent to verification")
 
@@ -204,11 +212,13 @@ def track(message):
                              '\n\nДанные:\n' + 'ID: ' + f'{message.from_user.id}' +
                              '\n' + 'Имя: ' + f'{message.from_user.first_name}' +
                              '\n' + 'Ник: @' + f'{message.from_user.username}'
-                             , reply_markup = verification_markup)
+                             , reply_markup=verification_markup)
+
 
 def track_waiting_time():
-    track_time = (len(track_list)*10)+10
+    track_time = (len(track_list) * 10) + 10
     return track_time
+
 
 def make_log(username, comment):
     log_file = open('/data/logs.txt', 'a', encoding='utf-8')
@@ -217,6 +227,8 @@ def make_log(username, comment):
 
     log_file.write(f'[{date} {time}][@{username}][{comment}]\n')
     log_file.close()
+
+
 @bot.message_handler(commands=['start'])
 def start(message):
     make_log(message.from_user.username, 'START')
@@ -230,11 +242,15 @@ def start(message):
         markup.add(controlPanelButton)
 
         make_log(message.from_user.username, 'not subscribed')
-        bot.send_message(message.chat.id, 'Для дальнейшей работы с ботом нужно подписаться на наш канал\n\nhttps://t.me/sdb_party', reply_markup=markup)
+        bot.send_message(message.chat.id,
+                         'Для дальнейшей работы с ботом нужно подписаться на наш канал\n\nhttps://t.me/sdb_party',
+                         reply_markup=markup)
+
 
 @bot.message_handler(commands=['admin'])
 def admin_command(message):
     bot.register_next_step_handler(message, admin)
+
 
 @bot.callback_query_handler(func=lambda callback: True)
 def callback_message(callback):
@@ -252,7 +268,8 @@ def callback_message(callback):
             make_log(callback.message.chat.username, 'subscribe')
 
             make_log(callback.message.chat.username, 'control panel')
-            bot.send_message(callback.message.chat.id, '<b>Панель управления</b>⬇️', reply_markup = markupKeyboard, parse_mode='html')
+            bot.send_message(callback.message.chat.id, '<b>Панель управления</b>⬇️', reply_markup=markupKeyboard,
+                             parse_mode='html')
         else:
             make_log(callback.message.chat.username, 'did not subscribed')
             pass
@@ -283,12 +300,13 @@ def callback_message(callback):
         make_log('admin', f"'{track_for_deleting}' deleted")
 
         list_of_tracks()
-        bot.edit_message_text(tracks_text, callback.message.chat.id, callback.message.message_id, reply_markup=delete_track_markup)
+        bot.edit_message_text(tracks_text, callback.message.chat.id, callback.message.message_id,
+                              reply_markup=delete_track_markup)
 
     elif callback.data == 'verify track':
         payment_markup = InlineKeyboardMarkup()
-        card_payment_button = InlineKeyboardButton('Оплатить картой', callback_data = 'card')
-        transfer_payment_button = InlineKeyboardButton('Оплатить переводом', callback_data = 'transfer')
+        card_payment_button = InlineKeyboardButton('Оплатить картой', callback_data='card')
+        transfer_payment_button = InlineKeyboardButton('Оплатить переводом', callback_data='transfer')
         # payment_markup.row(card_payment_button)
         payment_markup.row(transfer_payment_button)
 
@@ -296,8 +314,11 @@ def callback_message(callback):
         verified_track_dict[new_track_message.from_user.id] = verified_track_name
 
         make_log(new_track_message.from_user.username, f"'{verified_track_name}' verified")
-        bot.edit_message_text('Трек "' + verified_track_name + '" одобрен', callback.message.chat.id, callback.message.message_id)
-        bot.send_message(new_track_message.chat.id, 'Трек "' + verified_track_name + '" одобрен\n\nВыберите способ оплаты: ', reply_markup=payment_markup)
+        bot.edit_message_text('Трек "' + verified_track_name + '" одобрен', callback.message.chat.id,
+                              callback.message.message_id)
+        bot.send_message(new_track_message.chat.id,
+                         'Трек "' + verified_track_name + '" одобрен\n\nВыберите способ оплаты: ',
+                         reply_markup=payment_markup)
         track_query = False
 
     elif callback.data == 'card':
@@ -305,7 +326,8 @@ def callback_message(callback):
         bot.send_invoice(
             callback.message.chat.id,
             'Трек на заказ',
-            'Ваш трек одобрен!\nКак только пройдет оплата, мы включим ' + verified_track_dict[callback.from_user.id] + f' в течение {track_waiting_time()-10} минут',
+            'Ваш трек одобрен!\nКак только пройдет оплата, мы включим ' + verified_track_dict[
+                callback.from_user.id] + f' в течение {track_waiting_time() - 10} минут',
             verified_track_dict[callback.from_user.id],
             paymentToken,
             'RUB',
@@ -317,16 +339,17 @@ def callback_message(callback):
         transfer_markup.add(transfer_send_button)
 
         make_log(new_track_message.from_user.username, f'transfer chosen')
-        bot.send_message(callback.message.chat.id, 'Перевод 300₽ по номеру телефона/карты на *Сбербанк*'+
+        bot.send_message(callback.message.chat.id, 'Перевод 300₽ по номеру телефона/карты на *Сбербанк*' +
                          '\nВ комментарии нужно указать название трека, который вы заказали' +
                          f' (`{verified_track_dict[callback.from_user.id]}`)' +
                          '\nРеквизиты/трек копируются при нажатии'
-                         '\n\n`+7(920)631-39-51`'+
-                         '\n\n`2202 2017 1573 9195`'+
-                         '\n\n*Владислав Максимилианович Ю.*', reply_markup= transfer_markup,parse_mode="MARKDOWN")
+                         '\n\n`+7(920)631-39-51`' +
+                         '\n\n`2202 2017 1573 9195`' +
+                         '\n\n*Владислав Максимилианович Ю.*', reply_markup=transfer_markup, parse_mode="MARKDOWN")
 
     elif callback.data == 'verify transfer':
-        make_log(new_track_message.from_user.username, f"transfer '{verified_track_dict[callback.from_user.id]}' send to verification")
+        make_log(new_track_message.from_user.username,
+                 f"transfer '{verified_track_dict[callback.from_user.id]}' send to verification")
         if transfer_verification_query == False:
             transfer_verification_query = True
             transfer_verification_callback = callback
@@ -334,15 +357,18 @@ def callback_message(callback):
             make_log(new_track_message.from_user.username, 'no transfer query')
 
             admin_verify_transfer_markup = InlineKeyboardMarkup()
-            admin_verify_transfer_button = InlineKeyboardButton('Подтвердить перевод', callback_data='admin verify transfer')
+            admin_verify_transfer_button = InlineKeyboardButton('Подтвердить перевод',
+                                                                callback_data='admin verify transfer')
             admin_verify_transfer_markup.add(admin_verify_transfer_button)
 
-            bot.send_message(905069756, f'Выполнен перевод за трек "{verified_track_dict[callback.from_user.id]}"', reply_markup=admin_verify_transfer_markup)
+            bot.send_message(905069756, f'Выполнен перевод за трек "{verified_track_dict[callback.from_user.id]}"',
+                             reply_markup=admin_verify_transfer_markup)
             bot.send_message(callback.message.chat.id, 'Ожидайте подтверждение платежа')
 
         else:
             make_log(new_track_message.from_user.username, 'TRANSFER QUERY')
-            bot.send_message(callback.message.chat.id, 'В данный момент происходит обработка платежа, подождите чуть-чуть :)')
+            bot.send_message(callback.message.chat.id,
+                             'В данный момент происходит обработка платежа, подождите чуть-чуть :)')
 
     elif callback.data == 'admin verify transfer':
         make_log('admin', f"transfer '{verified_track_dict[transfer_verification_callback.from_user.id]}' verified")
@@ -351,17 +377,20 @@ def callback_message(callback):
         bot.edit_message_text('Перевод за трек "' + verified_track_dict[transfer_verification_callback.from_user.id] +
                               '" подтвержден', callback.message.chat.id, callback.message.message_id)
         bot.send_message(transfer_verification_callback.message.chat.id,
-                         f'Платеж подтвержден! Мы включим "{verified_track_dict[transfer_verification_callback.from_user.id]}" в течение {track_waiting_time()-10} минут')
+                         f'Платеж подтвержден! Мы включим "{verified_track_dict[transfer_verification_callback.from_user.id]}" в течение {track_waiting_time() - 10} минут')
         make_log('INFO', f"Track list: {track_list}")
 
     elif callback.data == 'reject track':
         make_log(new_track_message.from_user.username, f"'{track_name}' rejected")
-        bot.send_message(new_track_message.chat.id, 'Трек не был одобрен, вы можете выбрать другой трек нажав на кнопку "Заказать трек"')
-        bot.edit_message_text('Трек "' + track_name + '" не был одобрен', callback.message.chat.id, callback.message.message_id)
+        bot.send_message(new_track_message.chat.id,
+                         'Трек не был одобрен, вы можете выбрать другой трек нажав на кнопку "Заказать трек"')
+        bot.edit_message_text('Трек "' + track_name + '" не был одобрен', callback.message.chat.id,
+                              callback.message.message_id)
         track_query = False
 
     elif callback.data == 'statistic':
         bot.send_message(callback.message.chat.id, f'Кликов: {track_clicks}\nОтмен: {track_cancellations}')
+
 
 @bot.message_handler()
 def answer(message):
@@ -393,9 +422,9 @@ def answer(message):
 
             text = f'Вы уже приобрели билет, вы действительно хотите купить еще один билет?\n\n<b>Ваши билеты:</b>'
             ticket_keys = ''
-            for i in range (tickets_amount):
+            for i in range(tickets_amount):
                 cursor.execute('SELECT ticket_key FROM tickets WHERE telegram_id = ? LIMIT ? OFFSET ?',
-                                   (tg_id, tickets_amount, i))
+                               (tg_id, tickets_amount, i))
                 key = cursor.fetchone()[0]
                 text += f'\n• Билет {key}'
                 ticket_keys += f'{key} '
@@ -416,18 +445,21 @@ def answer(message):
             cancel_button = InlineKeyboardButton('ОТМЕНА')
             cancel_markup.add(cancel_button)
 
-            bot.send_message(message.chat.id,
-                        'Заказ трека стоит 300 рублей, трек можно заказать в таком то стиле такие условия и тд\n' +
-                        'Введите трек, который хотите заказать и ждите, пока он пройдет верификацию' +
-                        f'\n\nТреков в очереди: {len(track_list)}' +
-                        f'\nПримерное время ожидания ~ {track_waiting_time()} минут', reply_markup=cancel_markup)
+            bot.send_message(message.chat.id, '*Стоимость заказа трека - 300₽* 💰'
+                                              '\n\nОтправь нам название трека , который ты хочешь услышать и мы включим его для тебя!'
+                                              '\n\n❗Название трека и исполнитель должны быть написаны одним сообщением ❗'
+                                              '\n\nТрек должен соответствовать тематике вечеринки и должен пройти верификацию☺️'
+                                              '\n\n*Рок, метал, джаз, барбарики верификацию не пройдут🚫'
+                                              '\n\nПеред тем как включить трек, диджей должен его подготовить, после оплаты может пройти до 15 минут 😗' +
+                                              f'\n\nТреков в очереди: {len(track_list)}' +
+                                              f'\nПримерное время ожидания ~ {track_waiting_time()} минут', reply_markup=cancel_markup, parse_mode='markdown')
             bot.register_next_step_handler(message, track)
         else:
             make_log(message.from_user.username, 'TRACK QUERY')
             bot.send_message(message.chat.id, 'Попробуйте позже')
 
     elif message.text.lower() == 'о sdbℹ️':
-        bot.send_message(message.chat.id, 'Привет, мы *SDB PARTY*, организаторы ночных вечеринок города Р.'
+        bot.send_message(message.chat.id, 'Мы - *SDB PARTY*, организаторы ночных вечеринок города Р.'
                                           '\n\n*Почему SDB?* Потому что четверо организаторов любят сдобные булочки и называют свой сквад - Сдобная братва 🥐'
                                           '\n\n*SDB* - нестандартный подход к организации вечеринок и к их рекламе '
                                           '\n\n🪩*SDB* - вечеринка, на которой музыку знает каждый, и ты гарантированно будешь танцевать, пока не устанешь 💃'
@@ -453,6 +485,7 @@ def answer(message):
         bot.send_photo(message.chat.id, sdb_logo, caption=info)
         make_log(message.from_user.username, 'next party info')
 
+
 def admin(message):
     if message.text.strip() == '14882012':
         admin_markup = InlineKeyboardMarkup()
@@ -464,9 +497,12 @@ def admin(message):
 
         bot.send_message(message.chat.id, 'Панель управления', reply_markup=admin_markup)
 
+
 @bot.pre_checkout_query_handler(func=lambda query: True)
 def checkout(pre_checkout_query):
-    bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True, error_message="Что-то пошло не так :(\nПопробуйте еще раз")
+    bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True,
+                                  error_message="Что-то пошло не так :(\nПопробуйте еще раз")
+
 
 @bot.message_handler(content_types=['successful_payment'])
 def got_payment(message):
@@ -482,7 +518,8 @@ def got_payment(message):
         conn = sqlite3.connect('/data/sdb.db')
         cursor = conn.cursor()
 
-        cursor.execute('INSERT INTO tickets (first_name, username, telegram_id, ticket_key) VALUES (?, ?, ?, ?)', (first_name, username, tg_id, key))
+        cursor.execute('INSERT INTO tickets (first_name, username, telegram_id, ticket_key) VALUES (?, ?, ?, ?)',
+                       (first_name, username, tg_id, key))
 
         conn.commit()
         cursor.close()
@@ -493,9 +530,12 @@ def got_payment(message):
     elif message.successful_payment.total_amount == 30000:
         make_log(message.from_user.username, f"'{verified_track_dict[message.from_user.id]}' paid successfully")
         bot.send_message(905069756, f"'{message.successful_payment.invoice_payload}' оплатили")
-        bot.send_message(message.chat.id, f'Трек успешно оплачен! Мы включим его в течение {track_waiting_time()} минут', parse_mode='Markdown')
+        bot.send_message(message.chat.id,
+                         f'Трек успешно оплачен! Мы включим его в течение {track_waiting_time()} минут',
+                         parse_mode='Markdown')
 
         track_list.append(message.successful_payment.invoice_payload)
         make_log('INFO', f"Track list: {track_list}")
+
 
 bot.infinity_polling()

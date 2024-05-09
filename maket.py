@@ -314,7 +314,7 @@ def callback_message(callback):
         verified_track_dict[new_track_message.from_user.id] = verified_track_name
 
         make_log(new_track_message.from_user.username, f"'{verified_track_name}' verified")
-        bot.edit_message_text('Трек "' + verified_track_name + '" одобрен', callback.message.chat.id,
+        bot.edit_message_text('Трек "' + verified_track_name + '" одобрен✅', callback.message.chat.id,
                               callback.message.message_id)
         bot.send_message(new_track_message.chat.id, 'Трек "' + verified_track_name + '" одобрен🥳\n\nОплата⬇️', reply_markup=payment_markup)
         track_query = False
@@ -386,12 +386,15 @@ def callback_message(callback):
         make_log(new_track_message.from_user.username, f"'{track_name}' rejected")
         bot.send_message(new_track_message.chat.id,
                          'К сожалению, трек не был одобрен😞\nВы можете выбрать другой трек, нажав на кнопку *"ЗАКАЗАТЬ ТРЕК🎶"*', parse_mode='markdown')
-        bot.edit_message_text('Трек "' + track_name + '" не был одобрен', callback.message.chat.id,
+        bot.edit_message_text('Трек "' + track_name + '" не был одобрен🚫', callback.message.chat.id,
                               callback.message.message_id)
         track_query = False
 
     elif callback.data == 'statistic':
         bot.send_message(callback.message.chat.id, f'Кликов: {track_clicks}\nОтмен: {track_cancellations}')
+
+    elif callback.data == 'transfer verification query update':
+        transfer_verification_query = False
 
 
 @bot.message_handler()
@@ -493,6 +496,7 @@ def admin(message):
         list_of_tracks_button = InlineKeyboardButton('Список треков', callback_data='track list')
         list_of_tickets_button = InlineKeyboardButton('Список билетов', callback_data='ticket list')
         statistic_button = InlineKeyboardButton('Статистика', callback_data='statistic')
+        transfer_verification_query_update_button = InlineKeyboardButton('Сбросить transfer_verification_query', callback_data='transfer verification query update')
         admin_markup.row(list_of_tracks_button, list_of_tickets_button)
         admin_markup.row(statistic_button)
 

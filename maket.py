@@ -369,7 +369,7 @@ def callback_message(callback):
 
 
         else:
-            make_log(new_track_message.from_user.username, 'TRANSFER QUERY')
+            make_log(new_track_message.from_user.username, '[W A R N I N G]TRANSFER QUERY')
             bot.send_message(callback.message.chat.id,
                              'В данный момент происходит обработка платежа🤖\nНажмите еще раз через пару минут :)')
 
@@ -469,7 +469,7 @@ def answer(message):
                                  f'\nПримерное время ожидания ~ {track_waiting_time()} минут', reply_markup=cancel_markup, parse_mode='markdown')
                 bot.register_next_step_handler(message, track)
             else:
-                make_log(message.from_user.username, 'TRACK QUERY')
+                make_log(message.from_user.username, '[W A R N I N G]TRACK QUERY')
                 bot.send_message(message.chat.id, 'В данный момент на верификации уже есть трек, попробуйте еще через 5 минут🥺')
         else:
             bot.send_message(message.chat.id, 'Трек можно заказать только во время тусовки❗\n*Дождитесь 22:00*😚', parse_mode='markdown')

@@ -407,6 +407,10 @@ def callback_message(callback):
             make_log('admin', 'party is over')
             is_party_started = False
 
+    elif callback.data == 'update track query':
+        if track_query == True:
+            track_query = False
+            make_log('admin', 'track query deleted')
 
 @bot.message_handler()
 def answer(message):
@@ -514,10 +518,12 @@ def admin(message):
         statistic_button = InlineKeyboardButton('Статистика', callback_data='statistic')
         transfer_verification_query_update_button = InlineKeyboardButton('Сбросить transfer_verification_query', callback_data='transfer verification query update')
         party_start_button = InlineKeyboardButton('Начать тусовку',callback_data='start party')
+        track_query_update_button = InlineKeyboardButton('Сбросить track_query',callback_data='update track query')
         admin_markup.row(list_of_tracks_button, list_of_tickets_button)
         admin_markup.row(statistic_button)
         admin_markup.row(transfer_verification_query_update_button)
         admin_markup.row(party_start_button)
+        admin_markup.row(track_query_update_button)
 
         bot.send_message(message.chat.id, 'Панель управления', reply_markup=admin_markup)
 

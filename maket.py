@@ -202,8 +202,8 @@ def track(message):
             make_log(message.from_user.username, f'request: {track_name}')
 
             verification_markup = InlineKeyboardMarkup()
-            verifyButton = InlineKeyboardButton('Одобрить', callback_data='verify track')
-            rejectButton = InlineKeyboardButton('Отказать', callback_data='reject track')
+            verifyButton = InlineKeyboardButton('Одобрить✅', callback_data='verify track')
+            rejectButton = InlineKeyboardButton('Отказать🚫', callback_data='reject track')
             verification_markup.row(verifyButton, rejectButton)
             make_log('INFO', f"'{track_name}' sent to verification")
 
@@ -376,7 +376,7 @@ def callback_message(callback):
         track_list.append(verified_track_dict[transfer_verification_callback.from_user.id])
         bot.edit_message_text('Перевод за трек "' + verified_track_dict[transfer_verification_callback.from_user.id] +
                               '" подтвержден', callback.message.chat.id, callback.message.message_id)
-        bot.delete_message(transfer_verification_callback.message.chat.id, transfer_verification_callback.message.message_id-1)
+        bot.delete_message(transfer_verification_callback.message.chat.id, transfer_verification_callback.message.message_id)
         bot.send_message(transfer_verification_callback.message.chat.id,
                          f'Платеж подтвержден! Мы включим "{verified_track_dict[transfer_verification_callback.from_user.id]}" в течение {track_waiting_time() - 10} минут')
         make_log('INFO', f"Track list: {track_list}")

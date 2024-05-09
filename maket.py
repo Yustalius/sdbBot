@@ -306,7 +306,7 @@ def callback_message(callback):
     elif callback.data == 'verify track':
         payment_markup = InlineKeyboardMarkup()
         card_payment_button = InlineKeyboardButton('Оплатить картой', callback_data='card')
-        transfer_payment_button = InlineKeyboardButton('Оплатить переводом', callback_data='transfer')
+        transfer_payment_button = InlineKeyboardButton('Оплатить переводом💸', callback_data='transfer')
         # payment_markup.row(card_payment_button)
         payment_markup.row(transfer_payment_button)
 
@@ -376,7 +376,8 @@ def callback_message(callback):
         track_list.append(verified_track_dict[transfer_verification_callback.from_user.id])
         bot.edit_message_text('Перевод за трек "' + verified_track_dict[transfer_verification_callback.from_user.id] +
                               '" подтвержден', callback.message.chat.id, callback.message.message_id)
-        bot.delete_message(transfer_verification_callback.message.chat.id, transfer_verification_callback.message.message_id)
+        make_log(transfer_verification_callback.message.from_user.username, transfer_verification_callback)
+        # bot.delete_message(transfer_verification_callback.message.chat.id, transfer_verification_callback.message.message_id)
         bot.send_message(transfer_verification_callback.message.chat.id,
                          f'Платеж подтвержден! Мы включим "{verified_track_dict[transfer_verification_callback.from_user.id]}" в течение {track_waiting_time() - 10} минут')
         make_log('INFO', f"Track list: {track_list}")
@@ -456,7 +457,7 @@ def answer(message):
             bot.register_next_step_handler(message, track)
         else:
             make_log(message.from_user.username, 'TRACK QUERY')
-            bot.send_message(message.chat.id, 'В данный момент на верификации уже есть трек, попробуйте через 5 минут🥺')
+            bot.send_message(message.chat.id, 'В данный момент на верификации уже есть трек, попробуйте еще через 5 минут🥺')
 
     elif message.text.lower() == 'о sdbℹ️':
         bot.send_message(message.chat.id, 'Мы - *SDB PARTY*, организаторы ночных вечеринок города Р.'

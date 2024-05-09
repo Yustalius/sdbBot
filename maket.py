@@ -5,7 +5,7 @@ import io
 from datetime import datetime
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice
 
-bot = telebot.TeleBot('7029750604:AAEh3Ozvv2BGmDY_VUvQBseulIiPQ-fKP60')
+bot = telebot.TeleBot('6734752408:AAFEwkUJsWoZGh-Hbgt2wVafo0UhCnkSTNM')
 paymentToken = '381764678:TEST:83709'
 
 global markupKeyboard

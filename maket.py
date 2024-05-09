@@ -11,12 +11,12 @@ paymentToken = '381764678:TEST:83709'
 
 global markupKeyboard
 markupKeyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-# servicesButton = KeyboardButton("КУПИТЬ БИЛЕТ")
+# servicesButton = KeyboardButton("КУПИТЬ БИЛЕТ🎫")
 # markupKeyboard.add(servicesButton)
-trackRequestButton = KeyboardButton("ЗАКАЗАТЬ ТРЕК")
+trackRequestButton = KeyboardButton("ЗАКАЗАТЬ ТРЕК🎶")
 markupKeyboard.add(trackRequestButton)
-infoButton = KeyboardButton('О нас')
-nextPartyButton = KeyboardButton('Когда следующая тусовка?')
+infoButton = KeyboardButton('О насℹ️')
+nextPartyButton = KeyboardButton('Когда следующая тусовка?🧐')
 markupKeyboard.row(infoButton, nextPartyButton)
 
 global delete_track_markup
@@ -427,7 +427,12 @@ def answer(message):
             bot.send_message(message.chat.id, 'Попробуйте позже')
 
     elif message.text.lower() == 'о нас':
-        bot.send_message(message.chat.id, 'Что-то про нас')
+        bot.send_message(message.chat.id, 'Привет, мы SDB PARTY, организаторы ночных вечеринок города Р.'
+                                          'Почему SDB? Потому что четверо организаторов любят сдобные булочки и называют свой сквад - Сдобная братва 🥐'
+                                          'SDB - нестандартный подход к организации вечеринок и к их рекламе '
+                                          '🪩SDB - вечеринка, на которой музыку знает каждый, и ты гарантированно будешь танцевать, пока не устанешь 💃'
+                                          'SDB - смешные и порой мега кринжевые Reels в инстаграме и мы это делаем не от того, что не умеем по другому, а потому что - это смешно 🤭'
+                                          'Ждем вас на наших вечеринках во VMESTE BAR ❤️', parse_mode='MARKDOWN')
         make_log(message.from_user.username, 'about us')
 
     elif message.text.lower() == 'когда следующая тусовка?':

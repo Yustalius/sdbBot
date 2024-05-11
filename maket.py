@@ -506,7 +506,7 @@ def answer(message):
         cursor.close()
         conn.close()
 
-        sdb_logo = open('resources/sdb b а 3.jpg', 'rb')
+        sdb_logo = open('resources/sdb full.jpg', 'rb')
         bot.send_photo(message.chat.id, sdb_logo, caption=info)
         make_log(message.from_user.username, 'next party info')
 

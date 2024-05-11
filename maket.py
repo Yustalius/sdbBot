@@ -481,7 +481,7 @@ def answer(message):
                 bot.send_message(message.chat.id, 'В данный момент на верификации уже есть трек, попробуйте еще через 5 минут🥺')
         else:
             make_log(message.from_user.username, 'party not started')
-            bot.send_message(message.chat.id, 'Трек можно заказать только во время тусовки❗\n*Дождитесь 22:00*😚', parse_mode='markdown')
+            bot.send_message(message.chat.id, 'Трек можно заказать только во время тусовки❗\n*Дождитесь следующей вечеринки*😚', parse_mode='markdown')
 
     elif message.text.lower() == 'о sdbℹ️':
         bot.send_message(message.chat.id, 'Мы - *SDB PARTY*, организаторы ночных вечеринок города Р.'

@@ -416,7 +416,7 @@ def callback_message(callback):
 def answer(message):
     global track_query, party_name, is_party_started
 
-    if message.text.lower() == 'купить билет':
+    if message.text.lower() == 'купить билет🎫':
         make_log(message.from_user.username, 'buy a ticket')
         tg_id = message.from_user.id
 

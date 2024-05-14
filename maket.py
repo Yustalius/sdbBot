@@ -6,12 +6,12 @@ from datetime import datetime
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice
 
 bot = telebot.TeleBot('6734752408:AAFEwkUJsWoZGh-Hbgt2wVafo0UhCnkSTNM')
-paymentToken = '381764678:TEST:83709'
+paymentToken = '390540012:LIVE:50842'
 
 global markupKeyboard
 markupKeyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-# servicesButton = KeyboardButton("КУПИТЬ БИЛЕТ🎫")
-# markupKeyboard.add(servicesButton)
+servicesButton = KeyboardButton("КУПИТЬ БИЛЕТ🎫")
+markupKeyboard.add(servicesButton)
 trackRequestButton = KeyboardButton("ЗАКАЗАТЬ ТРЕК🎶")
 markupKeyboard.add(trackRequestButton)
 infoButton = KeyboardButton('О SDBℹ️')
@@ -310,7 +310,7 @@ def callback_message(callback):
         payment_markup = InlineKeyboardMarkup()
         card_payment_button = InlineKeyboardButton('Оплатить картой', callback_data='card')
         transfer_payment_button = InlineKeyboardButton('Оплатить переводом💸', callback_data='transfer')
-        # payment_markup.row(card_payment_button)
+        payment_markup.row(card_payment_button)
         payment_markup.row(transfer_payment_button)
 
         verified_track_name = track_name
